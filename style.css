@@ -1,0 +1,58 @@
+body {
+  background-image: url(period.webp);
+  font-family: Arial, Helvetica, sans-serif;
+  background-size: cover;
+  min-height: 100px;
+  background-attachment: fixed;
+}
+
+.container {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px;
+}
+
+h1 {
+  color:brown;
+}
+
+label {
+  display: block;
+  margin: 1px 0 5px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+button {
+   background: brown;
+   color: white;
+   padding: 10px;
+   border: none;
+   width: 50%;
+   border-radius: 5px;
+   cursor: pointer;
+   font-size: 16px;
+   
+}
+
+button:hover {
+  background: black;
+}
+
+#result {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 15px;
+  color: black;
+}
