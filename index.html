@@ -3,78 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FlowBelle</title>
+  <title>FlowBelle – Period Tracker</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Nunito&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="login-screen">
-    <h2>Welcome to FlowBelle</h2>
-    <input type="text" id="username-input" placeholder="Enter your name" />
-    <div class="avatar-selection">
-      <img src="https://i.imgur.com/uIgDDDd.png" alt="Fairy 1" />
-      <img src="https://i.imgur.com/GzCEkUS.png" alt="Fairy 2" />
-      <img src="https://i.imgur.com/2Rk1BTF.png" alt="Fairy 3" />
-    </div>
-    <button id="login-button">Start Tracking</button>
+    <h2>Welcome to FlowBelle 💖</h2>
+    <input type="text" id="nameInput" placeholder="Enter your name" />
+    <button onclick="saveName()">Start</button>
   </div>
 
-  <button id="theme-toggle">🌙</button>
-
-  <header>
-    <h1 class="logo">FlowBelle</h1>
-    <p id="greeting">Hi, Bella!</p>
-  </header>
-
-  <main>
-    <section class="cycle-info">
-      <h2>Period Days</h2>
-      <p>Your period is expected in <strong>4 days</strong>.</p>
-    </section>
-
-    <section class="calendar">
-      <h3>Track Your Cycle</h3>
-      <div class="calendar-grid"></div>
-    </section>
-
-    <section class="mood">
-      <h3>How do you feel today?</h3>
-      <div class="mood-options">
-        <button>😊</button>
-        <button>😢</button>
-        <button>😠</button>
-        <button>😴</button>
-        <button>❤️</button>
+  <div id="app" style="display:none;">
+    <header>
+      <div class="logo">FlowBelle</div>
+      <div class="user-options">
+        <span id="greeting"></span>
+        <button onclick="editName()">Edit Name</button>
+        <button onclick="resetApp()">Logout</button>
+        <button onclick="toggleMode()">🌙</button>
       </div>
-      <p id="mood-stats"></p>
-    </section>
+    </header>
 
-    <section class="symptoms">
-      <h3>Log Your Symptoms</h3>
-      <div class="symptom-options">
-        <label><input type="checkbox" value="Cramps"> Cramps</label>
-        <label><input type="checkbox" value="Bloating"> Bloating</label>
-        <label><input type="checkbox" value="Acne"> Acne</label>
-        <label><input type="checkbox" value="Tender Breasts"> Tender Breasts</label>
-        <label><input type="checkbox" value="Mood Swings"> Mood Swings</label>
-        <label><input type="checkbox" value="Fatigue"> Fatigue</label>
-      </div>
-      <button id="save-symptoms">Save Symptoms</button>
-      <p id="symptom-list"></p>
-    </section>
+    <main>
+      <section class="cycle-info">
+        <p>You're on Day <span id="day-counter">2</span> of your period. Flow light today.</p>
+      </section>
 
-    <section class="stats">
-      <h3>Cycle Stats</h3>
-      <p>Average cycle length: 28 days</p>
-      <p>Next ovulation: <span class="ovulation">June 15</span></p>
-    </section>
+      <section class="ovulation">
+        <h3>Ovulation Forecast</h3>
+        <p>Your next ovulation day is likely <span id="ovulation-day"></span> 🐣</p>
+      </section>
 
-    <section class="logout">
-      <button id="logout">Logout / Reset</button>
-    </section>
-  </main>
+      <section class="calendar">
+        <h3>Cycle Calendar</h3>
+        <div class="calendar-grid"></div>
+      </section>
 
-  <div class="heart-fairy">🧚‍♀️</div>
+      <section class="mood-log">
+        <h3>How do you feel today?</h3>
+        <div class="mood-options">
+          <button onclick="logMood('😊')">😊</button>
+          <button onclick="logMood('😞')">😞</button>
+          <button onclick="logMood('😠')">😠</button>
+          <button onclick="logMood('🥱')">🥱</button>
+          <button onclick="logMood('❤️')">❤️</button>
+        </div>
+      </section>
+
+      <section class="symptom-log">
+        <h3>Log Your Symptoms</h3>
+        <div class="symptom-options">
+          <label><input type="checkbox" value="Cramps"> Cramps</label>
+          <label><input type="checkbox" value="Bloating"> Bloating</label>
+          <label><input type="checkbox" value="Headache"> Headache</label>
+          <label><input type="checkbox" value="Backache"> Backache</label>
+          <label><input type="checkbox" value="Tender Breasts"> Tender Breasts</label>
+        </div>
+        <button onclick="saveSymptoms()">Save Symptoms</button>
+      </section>
+
+      <section class="stats">
+        <h3>My Stats</h3>
+        <p><strong>Mood Today:</strong> <span id="saved-mood">—</span></p>
+        <p><strong>Symptoms:</strong> <span id="saved-symptoms">—</span></p>
+      </section>
+    </main>
+
+    <div class="heart-fairy" onclick="playFairySound()">💖</div>
+    <audio id="fairy-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_8871f350e7.mp3" preload="auto"></audio>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>

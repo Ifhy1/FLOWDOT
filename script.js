@@ -1,104 +1,109 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const loginScreen = document.getElementById("login-screen");
-  const usernameInput = document.getElementById("username-input");
-  const loginButton = document.getElementById("login-button");
-  const greeting = document.getElementById("greeting");
-  const avatarImgs = document.querySelectorAll(".avatar-selection img");
-  const calendarGrid = document.querySelector(".calendar-grid");
-  const themeToggle = document.getElementById("theme-toggle");
-  const moodStats = document.getElementById("mood-stats");
-  const symptomList = document.getElementById("symptom-list");
+// Show login
+window.onload = () => {
+  const name = localStorage.getItem("username");
+  if (name) {
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    document.getElementById("greeting").textContent = `Hi, ${name}! 🌸`;
+  }
+
+  document.getElementById("saved-mood").textContent = localStorage.getItem("moodToday") || "—";
+  document.getElementById("saved-symptoms").textContent = localStorage.getItem("symptomsToday") || "—";
+  loadSavedPeriodDays();
+  updateOvulationDate();
+
+  setTimeout(showAffirmation, 3000);
+};
+
+function saveName() {
+  const name = document.getElementById("nameInput").value.trim();
+  if (name) {
+    localStorage.setItem("username", name);
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    document.getElementById("greeting").textContent = `Hi, ${name}! 🌸`;
+  }
+}
+
+function editName() {
+  const newName = prompt("Edit your name:");
+  if (newName) {
+    localStorage.setItem("username", newName);
+    document.getElementById("greeting").textContent = `Hi, ${newName}! 🌸`;
+  }
+}
+
+function resetApp() {
+  localStorage.clear();
+  location.reload();
+}
+
+function logMood(mood) {
+  localStorage.setItem("moodToday", mood);
+  document.getElementById("saved-mood").textContent = mood;
+  alert("Mood saved: " + mood);
+}
+
+function saveSymptoms() {
+  const symptoms = Array.from(document.querySelectorAll('.symptom-options input:checked')).map(input => input.value);
+  localStorage.setItem("symptomsToday", symptoms.join(", "));
+  document.getElementById("saved-symptoms").textContent = symptoms.join(", ");
+  alert("Saved symptoms: " + symptoms.join(", "));
+}
+
+// Calendar
+const calendarGrid = document.querySelector('.calendar-grid');
+for (let i = 1; i <= 30; i++) {
+  const day = document.createElement('div');
+  day.textContent = i;
+  day.addEventListener('click', () => toggleDaySelection(i, day));
+  calendarGrid.appendChild(day);
+}
+
+function toggleDaySelection(day, element) {
+  const saved = JSON.parse(localStorage.getItem("periodDays")) || [];
+  const index = saved.indexOf(day);
+  if (index !== -1) {
+    saved.splice(index, 1);
+    element.classList.remove("active", "selected");
+  } else {
+    saved.push(day);
+    element.classList.add("active", "selected");
+  }
+  localStorage.setItem("periodDays", JSON.stringify(saved));
+}
+
+function loadSavedPeriodDays() {
+  const saved = JSON.parse(localStorage.getItem("periodDays")) || [];
+  const days = document.querySelectorAll(".calendar-grid div");
+  saved.forEach(day => {
+    if (days[day - 1]) days[day - 1].classList.add("active", "selected");
+  });
+}
+
+function updateOvulationDate() {
+  const today = new Date();
+  today.setDate(today.getDate() + 12);
+  document.getElementById("ovulation-day").textContent = today.toDateString();
+}
+
+function playFairySound() {
+  document.getElementById("fairy-sound").play();
+  alert("💖 Your body is magical. You're doing amazing, girl!");
+}
+
+function showAffirmation() {
   const affirmations = [
-    "You are strong and capable!",
-    "Your body is amazing.",
-    "Take a deep breath, you're doing great!",
-    "Hydrate and glow today 🌸",
-    "Rest is productive too 💫",
-    "You're in tune with your cycle 🌙"
+    "You are strong and beautiful.",
+    "Your cycle does not define your worth.",
+    "Every day is a new chance to bloom.",
+    "Be kind to yourself today.",
+    "Your body is working wonders."
   ];
+  const random = affirmations[Math.floor(Math.random() * affirmations.length)];
+  alert("💬 Daily Affirmation: " + random);
+}
 
-  const storedName = localStorage.getItem("username");
-  const storedAvatar = localStorage.getItem("avatar");
-  const storedTheme = localStorage.getItem("theme");
-
-  if (storedTheme === "dark") {
-    document.body.classList.add("dark-mode");
-  }
-
-  if (storedName) {
-    greeting.textContent = `Hi, ${storedName}!`;
-    loginScreen.style.display = "none";
-  }
-
-  if (storedAvatar) {
-    avatarImgs.forEach(img => {
-      if (img.src === storedAvatar) {
-        img.classList.add("selected");
-      }
-    });
-  }
-
-  loginButton.addEventListener("click", () => {
-    const name = usernameInput.value.trim();
-    if (name !== "") {
-      localStorage.setItem("username", name);
-      greeting.textContent = `Hi, ${name}!`;
-      loginScreen.style.display = "none";
-    }
-  });
-
-  avatarImgs.forEach(img => {
-    img.addEventListener("click", () => {
-      avatarImgs.forEach(i => i.classList.remove("selected"));
-      img.classList.add("selected");
-      localStorage.setItem("avatar", img.src);
-    });
-  });
-
-  for (let i = 1; i <= 30; i++) {
-    const day = document.createElement("div");
-    day.textContent = i;
-    day.addEventListener("click", () => {
-      if (day.classList.contains("selected")) {
-        day.classList.remove("selected");
-      } else {
-        day.classList.add("selected");
-      }
-    });
-    calendarGrid.appendChild(day);
-  }
-
-  themeToggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
-    const isDark = document.body.classList.contains("dark-mode");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  });
-
-  const moodButtons = document.querySelectorAll(".mood-options button");
-  moodButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      const mood = button.textContent;
-      moodStats.textContent = `Today's mood: ${mood}`;
-      localStorage.setItem("mood", mood);
-    });
-  });
-
-  const saveSymptoms = document.getElementById("save-symptoms");
-  saveSymptoms.addEventListener("click", () => {
-    const checked = document.querySelectorAll(".symptom-options input:checked");
-    const symptoms = Array.from(checked).map(i => i.value);
-    symptomList.textContent = `Logged symptoms: ${symptoms.join(", ")}`;
-    localStorage.setItem("symptoms", JSON.stringify(symptoms));
-  });
-
-  function showAffirmation() {
-    const affirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
-    alert(affirmation);
-  }
-  setTimeout(showAffirmation, 3000); 
-
-  document.getElementById("logout").addEventListener("click", () => {
-    localStorage.clear();
-    window.location.reload();
-  });
-});
+function toggleMode() {
+  document.body.classList.toggle("dark");
+}
