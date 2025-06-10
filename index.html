@@ -10,12 +10,18 @@
 <body>
   <header>
     <div class="logo">FlowBelle</div>
+    <button class="mode-toggle" onclick="toggleTheme()">🌙</button>
   </header>
 
   <main>
     <section class="cycle-info">
       <h2>Hi, Bella! 🌸</h2>
       <p>You're on Day <span id="day-counter">2</span> of your period. Flow light today.</p>
+    </section>
+
+    <section class="affirmation">
+      <h3>✨ Daily Affirmation</h3>
+      <p id="affirmation-text">You're strong, kind, and beautiful just as you are.</p>
     </section>
 
     <section class="ovulation">
@@ -61,7 +67,6 @@
   <div class="heart-fairy" onclick="playFairySound()">💖</div>
 
   <audio id="fairy-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_8871f350e7.mp3" preload="auto"></audio>
-
   <script src="script.js"></script>
 </body>
 </html>
