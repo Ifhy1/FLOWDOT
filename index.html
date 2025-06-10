@@ -8,36 +8,37 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Nunito&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div id="login-screen">
-    <h2>Welcome to FlowBelle 💖</h2>
-    <input type="text" id="nameInput" placeholder="Enter your name" />
-    <button onclick="saveName()">Start</button>
+  <div id="login-screen" class="screen">
+    <h2>Welcome to FlowBelle 🌸</h2>
+    <input type="text" id="username" placeholder="Enter your name" />
+    <input type="date" id="start-date" />
+    <button onclick="startApp()">Start Tracking</button>
   </div>
 
-  <div id="app" style="display:none;">
+  <div id="app-screen" class="screen hidden">
     <header>
       <div class="logo">FlowBelle</div>
-      <div class="user-options">
-        <span id="greeting"></span>
+      <div class="top-controls">
+        <button onclick="toggleTheme()">🌙/☀️</button>
         <button onclick="editName()">Edit Name</button>
         <button onclick="resetApp()">Logout</button>
-        <button onclick="toggleMode()">🌙</button>
       </div>
     </header>
 
     <main>
       <section class="cycle-info">
-        <p>You're on Day <span id="day-counter">2</span> of your period. Flow light today.</p>
+        <h2 id="greeting">Hi, Bella! 🌸</h2>
+        <p id="cycle-day-text">You're on Day <span id="day-counter">—</span> of your period.</p>
       </section>
 
       <section class="ovulation">
         <h3>Ovulation Forecast</h3>
-        <p>Your next ovulation day is likely <span id="ovulation-day"></span> 🐣</p>
+        <p>Your next ovulation day is likely <span id="ovulation-day">—</span> 🐣</p>
       </section>
 
       <section class="calendar">
         <h3>Cycle Calendar</h3>
-        <div class="calendar-grid"></div>
+        <div class="calendar-grid" id="calendar-grid"></div>
       </section>
 
       <section class="mood-log">
@@ -67,6 +68,11 @@
         <h3>My Stats</h3>
         <p><strong>Mood Today:</strong> <span id="saved-mood">—</span></p>
         <p><strong>Symptoms:</strong> <span id="saved-symptoms">—</span></p>
+      </section>
+
+      <section class="affirmation">
+        <h3>🌼 Daily Affirmation</h3>
+        <p id="daily-affirmation">You are strong, beautiful, and growing every day.</p>
       </section>
     </main>
 

@@ -1,109 +1,131 @@
-// Show login
-window.onload = () => {
-  const name = localStorage.getItem("username");
-  if (name) {
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    document.getElementById("greeting").textContent = `Hi, ${name}! 🌸`;
-  }
+// DOM elements
+const loginScreen = document.getElementById('login-screen');
+const appScreen = document.getElementById('app-screen');
+const usernameInput = document.getElementById('username');
+const greeting = document.getElementById('greeting');
+const dayCounter = document.getElementById('day-counter');
+const ovulationDay = document.getElementById('ovulation-day');
+const calendarGrid = document.getElementById('calendar-grid');
+const dailyAffirmation = document.getElementById('daily-affirmation');
 
-  document.getElementById("saved-mood").textContent = localStorage.getItem("moodToday") || "—";
-  document.getElementById("saved-symptoms").textContent = localStorage.getItem("symptomsToday") || "—";
-  loadSavedPeriodDays();
-  updateOvulationDate();
-
-  setTimeout(showAffirmation, 3000);
+// Data
+const userData = {
+  name: '',
+  periodDays: [],
+  moods: {},
+  symptoms: {}
 };
 
-function saveName() {
-  const name = document.getElementById("nameInput").value.trim();
-  if (name) {
-    localStorage.setItem("username", name);
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    document.getElementById("greeting").textContent = `Hi, ${name}! 🌸`;
+function startApp() {
+  const name = usernameInput.value.trim();
+  if (!name) {
+    alert("Please enter your name.");
+    return;
   }
+
+  userData.name = name;
+  localStorage.setItem('flowBelle', JSON.stringify(userData));
+  loginScreen.classList.add('hidden');
+  appScreen.classList.remove('hidden');
+
+  greeting.textContent = `Hi, ${name}! 🌸`;
+  generateCalendar();
+  setAffirmation();
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('dark');
 }
 
 function editName() {
-  const newName = prompt("Edit your name:");
+  const newName = prompt("Enter a new name:");
   if (newName) {
-    localStorage.setItem("username", newName);
-    document.getElementById("greeting").textContent = `Hi, ${newName}! 🌸`;
+    userData.name = newName.trim();
+    greeting.textContent = `Hi, ${newName}! 🌸`;
+    localStorage.setItem('flowBelle', JSON.stringify(userData));
   }
 }
 
 function resetApp() {
-  localStorage.clear();
+  localStorage.removeItem('flowBelle');
   location.reload();
 }
 
-function logMood(mood) {
-  localStorage.setItem("moodToday", mood);
-  document.getElementById("saved-mood").textContent = mood;
-  alert("Mood saved: " + mood);
+function generateCalendar() {
+  calendarGrid.innerHTML = '';
+  for (let i = 1; i <= 30; i++) {
+    const day = document.createElement('div');
+    day.textContent = i;
+    if (userData.periodDays.includes(i)) {
+      day.classList.add('selected');
+    }
+    day.onclick = () => toggleDaySelection(i, day);
+    calendarGrid.appendChild(day);
+  }
+  updateCycleInfo();
+}
+
+function toggleDaySelection(day, el) {
+  const index = userData.periodDays.indexOf(day);
+  if (index > -1) {
+    userData.periodDays.splice(index, 1);
+    el.classList.remove('selected');
+  } else {
+    userData.periodDays.push(day);
+    el.classList.add('selected');
+  }
+  localStorage.setItem('flowBelle', JSON.stringify(userData));
+  updateCycleInfo();
+}
+
+function updateCycleInfo() {
+  if (userData.periodDays.length) {
+    const today = Math.max(...userData.periodDays);
+    const day = 30 - today + 1;
+    dayCounter.textContent = day;
+    if (day >= 12 && day <= 16) {
+      ovulationDay.textContent = "Ovulation likely happening now 🌼";
+    } else {
+      ovulationDay.textContent = "Not in ovulation window.";
+    }
+  } else {
+    dayCounter.textContent = "—";
+    ovulationDay.textContent = "—";
+  }
+}
+
+function logMood(emoji) {
+  const today = new Date().toISOString().split('T')[0];
+  userData.moods[today] = emoji;
+  localStorage.setItem('flowBelle', JSON.stringify(userData));
+  document.getElementById('saved-mood').textContent = emoji;
 }
 
 function saveSymptoms() {
-  const symptoms = Array.from(document.querySelectorAll('.symptom-options input:checked')).map(input => input.value);
-  localStorage.setItem("symptomsToday", symptoms.join(", "));
-  document.getElementById("saved-symptoms").textContent = symptoms.join(", ");
-  alert("Saved symptoms: " + symptoms.join(", "));
-}
-
-// Calendar
-const calendarGrid = document.querySelector('.calendar-grid');
-for (let i = 1; i <= 30; i++) {
-  const day = document.createElement('div');
-  day.textContent = i;
-  day.addEventListener('click', () => toggleDaySelection(i, day));
-  calendarGrid.appendChild(day);
-}
-
-function toggleDaySelection(day, element) {
-  const saved = JSON.parse(localStorage.getItem("periodDays")) || [];
-  const index = saved.indexOf(day);
-  if (index !== -1) {
-    saved.splice(index, 1);
-    element.classList.remove("active", "selected");
-  } else {
-    saved.push(day);
-    element.classList.add("active", "selected");
-  }
-  localStorage.setItem("periodDays", JSON.stringify(saved));
-}
-
-function loadSavedPeriodDays() {
-  const saved = JSON.parse(localStorage.getItem("periodDays")) || [];
-  const days = document.querySelectorAll(".calendar-grid div");
-  saved.forEach(day => {
-    if (days[day - 1]) days[day - 1].classList.add("active", "selected");
+  const checkboxes = document.querySelectorAll('.symptom-options input[type="checkbox"]');
+  const selected = [];
+  checkboxes.forEach(cb => {
+    if (cb.checked) selected.push(cb.value);
+    cb.checked = false;
   });
+  const today = new Date().toISOString().split('T')[0];
+  userData.symptoms[today] = selected;
+  localStorage.setItem('flowBelle', JSON.stringify(userData));
+  document.getElementById('saved-symptoms').textContent = selected.join(', ') || "—";
 }
 
-function updateOvulationDate() {
-  const today = new Date();
-  today.setDate(today.getDate() + 12);
-  document.getElementById("ovulation-day").textContent = today.toDateString();
+function setAffirmation() {
+  const affirmations = [
+    "You're strong, capable, and growing.",
+    "Each cycle is a new beginning.",
+    "Honor your rhythm. Rest is strength.",
+    "You bloom in your own time.",
+    "You are more than your cycle — you're magic."
+  ];
+  const random = Math.floor(Math.random() * affirmations.length);
+  dailyAffirmation.textContent = affirmations[random];
 }
 
 function playFairySound() {
-  document.getElementById("fairy-sound").play();
-  alert("💖 Your body is magical. You're doing amazing, girl!");
-}
-
-function showAffirmation() {
-  const affirmations = [
-    "You are strong and beautiful.",
-    "Your cycle does not define your worth.",
-    "Every day is a new chance to bloom.",
-    "Be kind to yourself today.",
-    "Your body is working wonders."
-  ];
-  const random = affirmations[Math.floor(Math.random() * affirmations.length)];
-  alert("💬 Daily Affirmation: " + random);
-}
-
-function toggleMode() {
-  document.body.classList.toggle("dark");
+  document.getElementById('fairy-sound').play();
 }
