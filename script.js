@@ -1,81 +1,89 @@
-// Generate calendar
-const calendarGrid = document.querySelector('.calendar-grid');
-const todayDate = new Date();
-const daysInMonth = 30;
+// Sign-in
+function signIn() {
+  const name = document.getElementById("username").value;
+  if (!name) return alert("Enter your name first!");
+  localStorage.setItem("flowbelle-user", name);
+  document.getElementById("user-name").innerText = name;
+  document.getElementById("auth-section").style.display = "none";
+  document.getElementById("tracker-section").style.display = "block";
+}
 
-for (let i = 1; i <= daysInMonth; i++) {
-  const day = document.createElement('div');
-  day.textContent = i;
-  if (i === todayDate.getDate()) {
-    day.classList.add('active');
+// Load username
+window.onload = () => {
+  const storedUser = localStorage.getItem("flowbelle-user");
+  if (storedUser) {
+    document.getElementById("user-name").innerText = storedUser;
+    document.getElementById("auth-section").style.display = "none";
+    document.getElementById("tracker-section").style.display = "block";
   }
 
-  day.addEventListener('click', () => {
-    savePeriodDay(i);
-    day.classList.add('active');
-  });
-
-  calendarGrid.appendChild(day);
-}
-
-// Ovulation forecast
-const ovulationSpan = document.getElementById("ovulation-day");
-const ovulationDate = new Date();
-ovulationDate.setDate(todayDate.getDate() + 12);
-ovulationSpan.textContent = ovulationDate.toDateString();
-
-// Notification reminder
-setTimeout(() => {
-  alert("💡 Reminder: Stay hydrated and gentle today. You're still in your period phase.");
-}, 5000);
-
-// Mood logger
-function logMood(mood) {
-  localStorage.setItem("moodToday", mood);
-  document.getElementById("saved-mood").textContent = mood;
-  alert("Mood saved: " + mood);
-}
-
-// Save symptoms
-function saveSymptoms() {
-  const symptoms = document.querySelectorAll('.symptom-options input:checked');
-  let selected = [];
-  symptoms.forEach(symptom => selected.push(symptom.value));
-  localStorage.setItem("symptomsToday", selected.join(", "));
-  document.getElementById("saved-symptoms").textContent = selected.join(", ");
-  alert("Saved symptoms: " + selected.join(", "));
-}
-
-// Load stats on start
-window.onload = () => {
-  const savedMood = localStorage.getItem("moodToday") || "—";
-  const savedSymptoms = localStorage.getItem("symptomsToday") || "—";
-  document.getElementById("saved-mood").textContent = savedMood;
-  document.getElementById("saved-symptoms").textContent = savedSymptoms;
-  loadSavedPeriodDays();
+  renderCalendar();
+  loadMoodStats();
 };
 
-// Period days saved
-function savePeriodDay(day) {
-  let saved = JSON.parse(localStorage.getItem("periodDays")) || [];
-  if (!saved.includes(day)) {
-    saved.push(day);
-    localStorage.setItem("periodDays", JSON.stringify(saved));
+// Calendar
+function renderCalendar() {
+  const calendar = document.getElementById("calendar");
+  calendar.innerHTML = "";
+  for (let i = 1; i <= 30; i++) {
+    const cell = document.createElement("div");
+    cell.innerText = i;
+    if (i === 13 || i === 14 || i === 15) {
+      cell.classList.add("active");
+    }
+    calendar.appendChild(cell);
   }
 }
 
-function loadSavedPeriodDays() {
-  const saved = JSON.parse(localStorage.getItem("periodDays")) || [];
-  const grid = document.querySelectorAll('.calendar-grid div');
-  saved.forEach(day => {
-    if (grid[day - 1]) {
-      grid[day - 1].classList.add('active');
+// Mood Tracking
+const moods = document.querySelectorAll("#mood-options button");
+let moodHistory = JSON.parse(localStorage.getItem("mood-log")) || [];
+
+moods.forEach(btn => {
+  btn.addEventListener("click", () => {
+    moodHistory.push({ mood: btn.innerText, date: new Date().toLocaleDateString() });
+    localStorage.setItem("mood-log", JSON.stringify(moodHistory));
+    loadMoodStats();
+  });
+});
+
+function loadMoodStats() {
+  const log = moodHistory.map(entry => `${entry.date}: ${entry.mood}`).join("<br>");
+  document.getElementById("mood-log").innerHTML = log || "No data yet";
+}
+
+// Theme Toggle
+document.getElementById("toggle-theme").addEventListener("click", () => {
+  document.body.classList.toggle("dark-theme");
+});
+
+// Avatar
+document.getElementById("avatar-btn").addEventListener("click", () => {
+  document.getElementById("avatar-popup").classList.toggle("show");
+});
+
+function setAvatar(emoji) {
+  document.querySelector(".heart-fairy").innerText = emoji;
+  document.getElementById("avatar-popup").classList.remove("show");
+  localStorage.setItem("flowbelle-avatar", emoji);
+}
+
+// Restore Avatar
+const savedAvatar = localStorage.getItem("flowbelle-avatar");
+if (savedAvatar) {
+  document.querySelector(".heart-fairy").innerText = savedAvatar;
+}
+
+// Notifications (basic reminder)
+if (Notification && Notification.permission !== "denied") {
+  Notification.requestPermission().then(permission => {
+    if (permission === "granted") {
+      setTimeout(() => {
+        new Notification("💖 Reminder", {
+          body: "Don't forget to track your mood today on FlowBelle!",
+        });
+      }, 5000);
     }
   });
 }
 
-// Play fairy sound
-function playFairySound() {
-  document.getElementById("fairy-sound").play();
-  alert("💖 Your body is magical. You're doing amazing, girl!");
-}
