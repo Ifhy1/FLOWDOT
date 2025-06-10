@@ -3,83 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FlowBelle</title>
+  <title>FlowBelle – Period Tracker</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Nunito:wght@400;600&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Nunito&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
     <div class="logo">FlowBelle</div>
-    <div class="top-controls">
-      <button id="toggle-theme">🌙</button>
-      <button id="avatar-btn">👩</button>
-      <button id="auth-btn">🔐</button>
-    </div>
   </header>
 
   <main>
-    <section class="auth-section" id="auth-section">
-      <input type="text" id="username" placeholder="Enter your name" />
-      <button onclick="signIn()">Start Tracking</button>
+    <section class="cycle-info">
+      <h2>Hi, Bella! 🌸</h2>
+      <p>You're on Day <span id="day-counter">2</span> of your period. Flow light today.</p>
     </section>
 
-    <section id="tracker-section" style="display: none;">
-      <h2>Welcome, <span id="user-name"></span> 💕</h2>
+    <section class="ovulation">
+      <h3>Ovulation Forecast</h3>
+      <p>Your next ovulation day is likely <span id="ovulation-day"></span> 🐣</p>
+    </section>
 
-      <section class="period-day-message" id="period-day-msg"></section>
+    <section class="calendar">
+      <h3>Cycle Calendar</h3>
+      <div class="calendar-grid"></div>
+    </section>
 
-      <section>
-        <h3>Cycle Calendar</h3>
-        <div class="calendar-grid" id="calendar"></div>
-      </section>
+    <section class="mood-log">
+      <h3>How do you feel today?</h3>
+      <div class="mood-options">
+        <button onclick="logMood('😊')">😊</button>
+        <button onclick="logMood('😞')">😞</button>
+        <button onclick="logMood('😠')">😠</button>
+        <button onclick="logMood('🥱')">🥱</button>
+        <button onclick="logMood('❤️')">❤️</button>
+      </div>
+    </section>
 
-      <section class="ovulation">
-        <h3>Ovulation Prediction</h3>
-        <p>Ovulation expected around <span id="ovulation-date">June 17</span></p>
-      </section>
+    <section class="symptom-log">
+      <h3>Log Your Symptoms</h3>
+      <div class="symptom-options">
+        <label><input type="checkbox" value="Cramps"> Cramps</label>
+        <label><input type="checkbox" value="Bloating"> Bloating</label>
+        <label><input type="checkbox" value="Headache"> Headache</label>
+        <label><input type="checkbox" value="Backache"> Backache</label>
+        <label><input type="checkbox" value="Tender Breasts"> Tender Breasts</label>
+      </div>
+      <button onclick="saveSymptoms()">Save Symptoms</button>
+    </section>
 
-      <section>
-        <h3>How are you feeling today?</h3>
-        <div class="mood-options" id="mood-options">
-          <button>😊</button>
-          <button>😔</button>
-          <button>😡</button>
-          <button>😭</button>
-          <button>😴</button>
-        </div>
-      </section>
-
-      <section>
-        <h3>Symptoms</h3>
-        <div class="symptom-options">
-          <label><input type="checkbox" value="Cramps"> Cramps</label>
-          <label><input type="checkbox" value="Bloating"> Bloating</label>
-          <label><input type="checkbox" value="Headache"> Headache</label>
-          <label><input type="checkbox" value="Tender Breasts"> Tender Breasts</label>
-        </div>
-        <button onclick="saveSymptoms()">Save Symptoms</button>
-      </section>
-
-      <section class="stats">
-        <h3>Your Mood Stats</h3>
-        <p id="mood-log">No data yet</p>
-        <h3>Logged Symptoms</h3>
-        <p id="symptom-log">No symptoms logged</p>
-      </section>
+    <section class="stats">
+      <h3>My Stats</h3>
+      <p><strong>Mood Today:</strong> <span id="saved-mood">—</span></p>
+      <p><strong>Symptoms:</strong> <span id="saved-symptoms">—</span></p>
     </section>
   </main>
 
-  <div class="heart-fairy" title="I’m here for you!">🧚‍♀️</div>
+  <div class="heart-fairy" onclick="playFairySound()">💖</div>
 
-  <div class="avatar-popup" id="avatar-popup">
-    <h3>Choose Your Avatar</h3>
-    <div class="avatar-options">
-      <button onclick="setAvatar('🦄')">🦄</button>
-      <button onclick="setAvatar('🐰')">🐰</button>
-      <button onclick="setAvatar('🧚‍♀️')">🧚‍♀️</button>
-      <button onclick="setAvatar('🌸')">🌸</button>
-    </div>
-  </div>
+  <audio id="fairy-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_8871f350e7.mp3" preload="auto"></audio>
 
   <script src="script.js"></script>
 </body>

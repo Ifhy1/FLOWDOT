@@ -1,124 +1,81 @@
-function signIn() {
-  const name = document.getElementById("username").value;
-  if (!name) return alert("Enter your name first!");
-  localStorage.setItem("flowbelle-user", name);
-  document.getElementById("user-name").innerText = name;
-  document.getElementById("auth-section").style.display = "none";
-  document.getElementById("tracker-section").style.display = "block";
+// Generate calendar
+const calendarGrid = document.querySelector('.calendar-grid');
+const todayDate = new Date();
+const daysInMonth = 30;
+
+for (let i = 1; i <= daysInMonth; i++) {
+  const day = document.createElement('div');
+  day.textContent = i;
+  if (i === todayDate.getDate()) {
+    day.classList.add('active');
+  }
+
+  day.addEventListener('click', () => {
+    savePeriodDay(i);
+    day.classList.add('active');
+  });
+
+  calendarGrid.appendChild(day);
 }
 
-// Load
+// Ovulation forecast
+const ovulationSpan = document.getElementById("ovulation-day");
+const ovulationDate = new Date();
+ovulationDate.setDate(todayDate.getDate() + 12);
+ovulationSpan.textContent = ovulationDate.toDateString();
+
+// Notification reminder
+setTimeout(() => {
+  alert("💡 Reminder: Stay hydrated and gentle today. You're still in your period phase.");
+}, 5000);
+
+// Mood logger
+function logMood(mood) {
+  localStorage.setItem("moodToday", mood);
+  document.getElementById("saved-mood").textContent = mood;
+  alert("Mood saved: " + mood);
+}
+
+// Save symptoms
+function saveSymptoms() {
+  const symptoms = document.querySelectorAll('.symptom-options input:checked');
+  let selected = [];
+  symptoms.forEach(symptom => selected.push(symptom.value));
+  localStorage.setItem("symptomsToday", selected.join(", "));
+  document.getElementById("saved-symptoms").textContent = selected.join(", ");
+  alert("Saved symptoms: " + selected.join(", "));
+}
+
+// Load stats on start
 window.onload = () => {
-  const storedUser = localStorage.getItem("flowbelle-user");
-  if (storedUser) {
-    document.getElementById("user-name").innerText = storedUser;
-    document.getElementById("auth-section").style.display = "none";
-    document.getElementById("tracker-section").style.display = "block";
-  }
-
-  renderCalendar();
-  loadMoodStats();
-  loadSymptoms();
-  hydrateReminder();
-
-  const savedAvatar = localStorage.getItem("flowbelle-avatar");
-  if (savedAvatar) {
-    document.querySelector(".heart-fairy").innerText = savedAvatar;
-  }
+  const savedMood = localStorage.getItem("moodToday") || "—";
+  const savedSymptoms = localStorage.getItem("symptomsToday") || "—";
+  document.getElementById("saved-mood").textContent = savedMood;
+  document.getElementById("saved-symptoms").textContent = savedSymptoms;
+  loadSavedPeriodDays();
 };
 
-function renderCalendar() {
-  const calendar = document.getElementById("calendar");
-  calendar.innerHTML = "";
-  for (let i = 1; i <= 30; i++) {
-    const cell = document.createElement("div");
-    cell.innerText = i;
-    cell.addEventListener("click", () => {
-      localStorage.setItem("period-day", i);
-      updatePeriodDayMsg(i);
-      highlightDate(i);
-    });
-    calendar.appendChild(cell);
-  }
-
-  const savedDay = localStorage.getItem("period-day");
-  if (savedDay) {
-    updatePeriodDayMsg(savedDay);
-    highlightDate(savedDay);
+// Period days saved
+function savePeriodDay(day) {
+  let saved = JSON.parse(localStorage.getItem("periodDays")) || [];
+  if (!saved.includes(day)) {
+    saved.push(day);
+    localStorage.setItem("periodDays", JSON.stringify(saved));
   }
 }
 
-function updatePeriodDayMsg(day) {
-  const msg = document.getElementById("period-day-msg");
-  msg.innerText = `You're on Day ${day} of your period 🌷`;
-}
-
-function highlightDate(day) {
-  const allCells = document.querySelectorAll(".calendar-grid div");
-  allCells.forEach(cell => cell.classList.remove("active"));
-  if (allCells[day - 1]) {
-    allCells[day - 1].classList.add("active");
-  }
-}
-
-// Mood Tracking
-const moods = document.querySelectorAll("#mood-options button");
-let moodHistory = JSON.parse(localStorage.getItem("mood-log")) || [];
-
-moods.forEach(btn => {
-  btn.addEventListener("click", () => {
-    moodHistory.push({ mood: btn.innerText, date: new Date().toLocaleDateString() });
-    localStorage.setItem("mood-log", JSON.stringify(moodHistory));
-    loadMoodStats();
+function loadSavedPeriodDays() {
+  const saved = JSON.parse(localStorage.getItem("periodDays")) || [];
+  const grid = document.querySelectorAll('.calendar-grid div');
+  saved.forEach(day => {
+    if (grid[day - 1]) {
+      grid[day - 1].classList.add('active');
+    }
   });
-});
-
-function loadMoodStats() {
-  const log = moodHistory.map(entry => `${entry.date}: ${entry.mood}`).join("<br>");
-  document.getElementById("mood-log").innerHTML = log || "No data yet";
 }
 
-// Symptom Logging
-function saveSymptoms() {
-  const symptoms = document.querySelectorAll(".symptom-options input:checked");
-  const values = Array.from(symptoms).map(s => s.value);
-  localStorage.setItem("symptom-log", JSON.stringify(values));
-  loadSymptoms();
-  alert("Symptoms saved!");
-}
-
-function loadSymptoms() {
-  const data = JSON.parse(localStorage.getItem("symptom-log")) || [];
-  document.getElementById("symptom-log").innerText = data.length ? data.join(", ") : "No symptoms logged";
-}
-
-// Theme
-document.getElementById("toggle-theme").addEventListener("click", () => {
-  document.body.classList.toggle("dark-theme");
-});
-
-// Avatar
-document.getElementById("avatar-btn").addEventListener("click", () => {
-  document.getElementById("avatar-popup").classList.toggle("show");
-});
-
-function setAvatar(emoji) {
-  document.querySelector(".heart-fairy").innerText = emoji;
-  document.getElementById("avatar-popup").classList.remove("show");
-  localStorage.setItem("flowbelle-avatar", emoji);
-}
-
-// Hydration reminder pop-up
-function hydrateReminder() {
-  if (Notification && Notification.permission !== "denied") {
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        setTimeout(() => {
-          new Notification("💧 Hydration Time", {
-            body: "Hey love! Don’t forget to drink water 💖",
-          });
-        }, 8000);
-      }
-    });
-  }
+// Play fairy sound
+function playFairySound() {
+  document.getElementById("fairy-sound").play();
+  alert("💖 Your body is magical. You're doing amazing, girl!");
 }
