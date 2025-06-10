@@ -1,4 +1,3 @@
-/* Reset & Base */
 * {
   margin: 0;
   padding: 0;
@@ -220,6 +219,21 @@ section {
   border: none;
   cursor: pointer;
 }
+
+.period-day-message {
+  background: #ffe0f0;
+  padding: 10px;
+  border-left: 4px solid #ff5fa2;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.dark-theme .period-day-message {
+  background: #37263d;
+}
+
 
 /* Responsive */
 @media (max-width: 768px) {
