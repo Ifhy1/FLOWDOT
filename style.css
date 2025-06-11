@@ -12,8 +12,9 @@ body {
   --bg-color: #ffd1dc;
   --text-color: #333;
   --accent-color: #ffb6c1;
-  --card-color: #ffb6c1;
+  --card-color: #ffddee;
   --highlight: #f67280;
+  --calender-text: #333;
 }
 
 .dark {
@@ -22,6 +23,7 @@ body {
   --accent-color: #ba99f5;
   --card-color: #3c3860;
   --highlight: #ffdaec;
+  --calender-text: #222;
 }
 
 .screen {
@@ -92,6 +94,7 @@ section {
 .calendar-grid div {
   padding: 0.5rem;
   background: white;
+  color: var(--calender-text);
   border: 1px solid var(--accent-color);
   border-radius: 8px;
   cursor: pointer;
